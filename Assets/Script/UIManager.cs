@@ -41,8 +41,21 @@ public class UIManager : MonoBehaviour
 
     public void Play()
     {
-        EventManager.AutoSpinStart(1);
-        ActiveAllButtons(false);
+        
+        playBtn.interactable = false;
+        if (EventManager.isPlayOver)
+        {
+            //Debug.Log("IsPlay Over : " + EventManager.isPlayOver);
+            
+            EventManager.AutoSpinStart(1);
+            //ActiveAllButtons(false);  
+        }
+        else
+        {
+            
+            EventManager.StartTimer();           
+        }
+        Invoke("ActivePlayBtn", 1);
         //EventManager.Play();
     }
 
@@ -56,7 +69,8 @@ public class UIManager : MonoBehaviour
     {
         EventManager.isAutoSpinStart = true;
         EventManager.AutoSpinStart(autoSpinCount);
-        ActiveAllButtons(false);
+        Debug.Log(autoSpinCount);
+        //ActiveAllButtons(false);
     }
 
     public void Settings()
@@ -74,6 +88,13 @@ public class UIManager : MonoBehaviour
                 settingsOption[i].GetComponent<Image>().sprite = optionDeSelection[i];
             }
         }
+    }
+
+    public void ActivePlayBtn()
+    {
+
+            playBtn.interactable = true;
+        
     }
 
     public void AutoSpinOptionSelection(int index)
@@ -103,9 +124,9 @@ public class UIManager : MonoBehaviour
 
     public void ActiveAllButtons(bool isOver)
     {
-        playBtn.interactable = isOver;
-        autoPlayBtn.interactable = isOver;
-        settingsBtn.interactable = isOver;
+        //playBtn.interactable = isOver;
+        //autoPlayBtn.interactable = isOver;
+        //settingsBtn.interactable = isOver;
         betUp.interactable = isOver;
         betDown.interactable = isOver;
     }

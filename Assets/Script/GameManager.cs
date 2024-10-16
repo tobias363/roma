@@ -8,6 +8,9 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+    public int extraBallTotal;
+    public NumberGenerator numberGenerator;
     public TextMeshProUGUI displayTotalMoney;
     public TextMeshProUGUI displayCurrentBets;
     public TextMeshProUGUI winAmtText;
@@ -15,7 +18,7 @@ public class GameManager : MonoBehaviour
     public Button btn_creditUp;
     public Button btn_creditDown;
     public List<TextMeshProUGUI> displayCurrentPoints = new List<TextMeshProUGUI>();
-
+    public List<TextMeshProUGUI> displayCardWinPoints = new List<TextMeshProUGUI>();
     public List<AllWinPoints> allWinPoints = new List<AllWinPoints>();
     public List<int> currentWinPoints = new List<int>();
     public List<int> totalBets = new List<int>();
@@ -24,6 +27,7 @@ public class GameManager : MonoBehaviour
     public int totalMoney = 0;
     public int currentBet;
     public static int winAmt;
+    private List<int> cardWin = new List<int>();
     public int betlevel;
     public List<int> winList;
     private ThemeMathEngine themeMathEngine;
@@ -40,11 +44,21 @@ public class GameManager : MonoBehaviour
 
     }
 
+    void Awake()
+    {
+        instance = this;
+        
+    }
     // Start is called before the first frame update
     void Start()
     {
-        SetTotalMoney(100);
+        SetTotalMoney(1000);
         SetCurrentBets(betlevel);
+        for (int i = 0; i < displayCardWinPoints.Count; i++)
+        {
+            cardWin.Add(0);
+            displayCardWinPoints[i].text = "WIN - 0";
+        }
     }
 
     private void OnPlay()
@@ -53,12 +67,18 @@ public class GameManager : MonoBehaviour
         winAmt = 0;
         if(winList.Count > 0) { winList.Clear(); }
         winAmtText.text = "0";
+        for (int i = 0; i < displayCardWinPoints.Count; i++)
+        {
+            cardWin[i] = 0;
+            displayCardWinPoints[i].text = "WIN - 0";
+        }
     }
     public void BetUp()
     {
         if (totalBets.Count - 1 > betlevel)
         {
             betlevel++;
+            Debug.Log("??????????? : " + betlevel );
             SetCurrentBets(betlevel);
             btn_creditDown.interactable = true;
         }
@@ -78,6 +98,7 @@ public class GameManager : MonoBehaviour
         if (betlevel >= 1)
         {
             betlevel--;
+            Debug.Log("??????????? : " + betlevel );
             SetCurrentBets(betlevel);
             btn_creditUp.interactable = true;
         }
@@ -95,7 +116,7 @@ public class GameManager : MonoBehaviour
     public void SetTotalMoney(int atm)
     {
         totalMoney += atm;
-        displayTotalMoney.text = totalMoney.ToString();
+        displayTotalMoney.text = totalMoney.ToString() ;
     }
 
     void SetCurrentBets(int lvl)
@@ -104,7 +125,7 @@ public class GameManager : MonoBehaviour
         displayCurrentBets.text = currentBet.ToString();
         for (int i = 0; i < CardBets.Count; i++)
         {
-            CardBets[i].text = "BET = "+(currentBet / 4).ToString();
+            CardBets[i].text = "= "+(currentBet / 4).ToString();
         }
         
         currentWinPoints = allWinPoints[lvl].points;
@@ -115,9 +136,8 @@ public class GameManager : MonoBehaviour
         }
         //themeMathEngine = new ThemeMathEngine(this);
     }
-
     
-    void ShowWinAmt(int index)
+    void ShowWinAmt(int cardNo, int index)
     {
         
         if (index < 5) //other
@@ -136,10 +156,16 @@ public class GameManager : MonoBehaviour
         {
             winAmt = currentWinPoints[currentWinPoints.Count - 1]; 
         }
-        
+
+        cardWin[cardNo] += winAmt;
+
+        displayCardWinPoints[cardNo].text = "WIN - "+ cardWin[cardNo].ToString() ;
+
         winList.Add(winAmt);
         winAmtText.text = winList.Sum(x => Convert.ToInt32(x)).ToString();
         SetTotalMoney(winList.Sum(x => Convert.ToInt32(x)));
+
+       
     }
 }
 [System.Serializable]

@@ -5,22 +5,24 @@ using UnityEngine;
 
 public class EventManager : MonoBehaviour
 {
-    public static Action<int> OnPayAmt;
+    public static Action<int, int> OnPayAmt;
     public static Action OnPlay;
-    
+    public static Action OnStartTimer;
+
     public static Action<int> OnAutoSpinStart;
     public static Action<bool> OnAutoSpinOver;
     
     public static Action<List<int>> OnGenerateBall;
     public static Action<int> OnBallDisplay;
-    public static Action<List<int>, bool> OnGenerateExtraBall;
+    public static Action<List<int>, bool, bool> OnGenerateExtraBall;
     public static Action<bool> OnTapForExtraBall;
     public static Action<int, bool> OnExtraBallCompletion;
 
     public static Action<int, bool> OnMatchedPattern;
     public static Action<int, int, bool> OnMissingPattern;
+
     public static Action OnBonusOver;
-    
+       
     public static bool isPlayOver = false;
     public static bool isAutoSpinStart = false;
     //public static bool isAutoSpinOver = false;
@@ -37,17 +39,17 @@ public class EventManager : MonoBehaviour
     {
         OnAutoSpinOver?.Invoke(gameOver);
     }
-    public static void AddWinAmt(int payLineIndex)
+    public static void AddWinAmt(int cardNo, int payLineIndex)
     {
-        OnPayAmt?.Invoke(payLineIndex);
+        OnPayAmt?.Invoke(cardNo, payLineIndex);
     }
     public static void GenerateBall(List<int> ballIndexList)
     {
         OnGenerateBall?.Invoke(ballIndexList);
     }
-    public static void GenerateExtraBall(List<int> ballIndexList, bool showExtraBall)
+    public static void GenerateExtraBall(List<int> ballIndexList, bool showExtraBall, bool showFreeExtraBalls)
     {
-        OnGenerateExtraBall?.Invoke(ballIndexList, showExtraBall);
+        OnGenerateExtraBall?.Invoke(ballIndexList, showExtraBall, showFreeExtraBalls);
     }
     public static void TapForExtraBall(bool isExtraBallLeft)
     {
@@ -68,6 +70,11 @@ public class EventManager : MonoBehaviour
     public static void ShowMissingPattern(int patternIndex, int colIndex, bool active)
     {
         OnMissingPattern?.Invoke(patternIndex, colIndex, active);
+    }
+
+    public static void StartTimer()
+    {
+        OnStartTimer?.Invoke();
     }
 
     public static void PlayOnBonusOver()

@@ -48,8 +48,8 @@ public class TopperManager : MonoBehaviour
     {
         patterns[index].SetActive(active);
     }
-    
-    
+
+
     private void DisableAllMatchedPattern()
     {
         for (int i = 0; i < matchedPatterns.Count; i++)
@@ -63,22 +63,12 @@ public class TopperManager : MonoBehaviour
     }
     private IEnumerator BlinkPattern(int index, bool active)
     {
-        if (index >= 5 && index <= 7) //For 2L
-        {
-            prizes[5].color = Color.black;
-        }
-        else if (index > 7 && index < 13)
-        {
-            prizes[index - 2].color = Color.black;
-        }
-        else if (index >= 13) //For 1L
-        {
-            prizes[missedPattern.Count - 1].color = Color.red;
-        }
+        matchedPatterns[index].SetActive(true);
+        index = GetPatternIndex(index);
+        prizes[index].color = Color.green;
 
         yield return new WaitForSeconds(0.2f);
     }
-
 
 
     private void DisableAllMissedPattern()
@@ -91,21 +81,12 @@ public class TopperManager : MonoBehaviour
             }
         }
     }
+
+
     private void ShowMissingPattern(int patternIndex, int colIndex, bool active)
     {
-        // Debug.Log("ONE");
-        if (patternIndex >= 5 && patternIndex <= 7) //For 2L
-        {
-            patternIndex = 5;
-        }
-        else if (patternIndex > 7 && patternIndex < 13)
-        {
-            patternIndex = patternIndex - 2;
-        }
-        else if (patternIndex >= 13) //For 1L
-        {
-            patternIndex = missedPattern.Count - 1;
-        }
+        patternIndex = GetPatternIndex(patternIndex);
+       
         // Debug.Log("pat " + patternIndex);
 
         if (!patternHighlightList.Contains(new KeyValuePair<int, int>(patternIndex, colIndex)))
@@ -119,29 +100,54 @@ public class TopperManager : MonoBehaviour
             if(active == false)
             {
                 int index = patternHighlightList.FindIndex(a => a.Key == patternIndex && a.Value == colIndex);
+                missedPattern[patternIndex].transform.GetChild(colIndex).gameObject.SetActive(false);
+                prizes[patternIndex].color = Color.green;
+
                 if (blinkMissingPattern[index] == null)
                     return;
                 StopCoroutine(blinkMissingPattern[index]);
                 patternHighlightList.RemoveAt(index);
                 blinkMissingPattern.RemoveAt(index);
+                NumberGenerator.isPrizeMissedByOneCard = false;
             }
         }
+        
     }
 
     IEnumerator BlinkMissingPattern(int patternIndex, int colIndex, bool active)
     {
-        while (active)
+        Color prizeColor = prizes[patternIndex].color;
+        while (active )
         {
+            NumberGenerator.isPrizeMissedByOneCard = true;
             missedPattern[patternIndex].transform.GetChild(colIndex).gameObject.SetActive(true);
-            prizes[patternIndex].color = Color.red;
+            prizes[patternIndex].color = Color.black;
             yield return new WaitForSeconds(0.2f);
 
             missedPattern[patternIndex].transform.GetChild(colIndex).gameObject.SetActive(false);
-            prizes[patternIndex].color = Color.white;
+            prizes[patternIndex].color = prizeColor;
             yield return new WaitForSeconds(0.2f);
         }
-		missedPattern[patternIndex].transform.GetChild(colIndex).gameObject.SetActive(false);
-        prizes[patternIndex].color = Color.white;
+        missedPattern[patternIndex].transform.GetChild(colIndex).gameObject.SetActive(false);
+        prizes[patternIndex].color = prizeColor;
+    }
+
+
+    public int GetPatternIndex(int index)
+    {
+        if (index >= 5 && index <= 7) //For 2L
+        {
+            index = 5;
+        }
+        else if (index > 7 && index < 13)
+        {
+            index = index - 2;
+        }
+        else if (index >= 13) //For 1L
+        {
+            index = missedPattern.Count - 1;
+        }
+        return index;
     }
 
     private void Reset()

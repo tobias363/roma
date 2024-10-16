@@ -12,6 +12,7 @@ public class BallManager : MonoBehaviour
     public List<Sprite> ballSprite;
     public GameObject ballPrefab;
     public Transform extraBallParent;
+    public Sprite extraBallSprite;
 
     public GameObject ballOutMachineAnimParent;
     public Image bigBallImg;
@@ -20,11 +21,14 @@ public class BallManager : MonoBehaviour
     public List<Sprite> bigBallSprite;
     private List<Sprite> bigBallSpriteSequence = new List<Sprite>();
     public List<GameObject> extraBalls;
-    private Vector3[] extraBaStartPos = new Vector3[9]; 
+    private Vector3[] extraBaStartPos = new Vector3[5]; 
     public float ballAnimSpeed = 0.11f;
+
+    [SerializeField]
     private List<int> ballIndexList = new List<int>();
-    private int[] extraBallPosArr = new int[10] {-315, 315, -245, 245 ,-175, 175, -105, 105, -35, 35 };
+    private int[] extraBallPosArr = new int[5] { -140, -70, 140, 70, 0 };
     private List<GameObject> instantiatedExtraBall = new List<GameObject>();
+
     private void OnEnable()
     {
         EventManager.OnGenerateBall += GenerateBall;
@@ -38,10 +42,12 @@ public class BallManager : MonoBehaviour
         ballOutMachineAnimParent.SetActive(true);
         bigBallImg.gameObject.SetActive(false);
 
-		if(ballMachine != null)
+        if(ballMachine != null)
         	ballMachine.SetActive(false);
         if(extraBallMachine != null)
         	extraBallMachine.SetActive(false);
+
+
     }
 
     private void OnDisable()
@@ -65,16 +71,20 @@ public class BallManager : MonoBehaviour
 
     void GenerateBall(List<int> _ballIndexList)
     {
+        //Debug.Log(_ballIndexList.Count);
         ballIndexList = _ballIndexList;
+        //debug.Log()
         ballOutMachineAnimParent.SetActive(false);
 
         AddRandomBallSprites();
         StartCoroutine(StartBallAnim());
     }
 
+
+
     void ShowExtraBallOnTap(bool isExtraBallLeft)
     {
-    	if(extraBallMachine != null)
+        if(extraBallMachine != null)
         	extraBallMachine.SetActive(isExtraBallLeft);
         bigBallImg.gameObject.SetActive(false);
         if(ballMachine != null)
@@ -87,21 +97,25 @@ public class BallManager : MonoBehaviour
                 EventManager.ShowMissingPL(i, true);
             }
         }
-    }
 
-    public void ShowExtraBallAfterTap(int index)
-    {
-        extraBalls[index].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[ballIndexList.Count - 1].ToString();
+        
     }
 
     int ballIndex = 0;
-    void GenerateExtraBall(List<int> _ballIndexList, bool showExtraBall)
+    void GenerateExtraBall(List<int> _ballIndexList, bool showExtraBall, bool showFreeExtraBall)
     {
-        Debug.Log("GenerateExtraBall : "+ showExtraBall);
-        //StartCoroutine(StartExtaBallAnim(ballIndexList, showExtraBall));        //For Auto show 5 extra balls
-        //StartCoroutine(StartExtaBallAnim(showExtraBall, ballIndex++));            //For Tap and show extra ball
+        Debug.Log("___showFreeExtraBall ------: "+ showFreeExtraBall);
         ballIndexList = _ballIndexList;
-        StartExtaBallAnim(showExtraBall, ballIndex++);
+        if (showFreeExtraBall)
+        {
+            Debug.Log("Show Extra Ball : "+ ballIndexList.Count);
+
+            StartCoroutine(StartExtaBallAnim(ballIndexList, showExtraBall));        //For Auto show 5 extra balls
+        }//StartCoroutine(StartExtaBallAnim(showExtraBall, ballIndex++));            //For Tap and show extra ball
+        else
+        {
+            StartExtaBallAnim(showExtraBall, ballIndex++);
+        }
     }
 
     void AddRandomBallSprites()
@@ -122,10 +136,8 @@ public class BallManager : MonoBehaviour
     {
         if (!bigBallImg.isActiveAndEnabled)
         {
-            if (ballMachine != null)
-                ballMachine.SetActive(true);
-            if (extraBallMachine != null)
-                extraBallMachine.SetActive(false);
+            ballMachine.SetActive(true);
+            extraBallMachine.SetActive(false);
             bigBallImg.gameObject.SetActive(true);
         }
         for (int i = 0; i < balls.Count; i++)
@@ -171,8 +183,6 @@ public class BallManager : MonoBehaviour
                             balls[i].transform.DOLocalMoveX(70 * ((i % 7) - 7 - 1), numberGenerator.ballAnimSpeed);
                         }
                     }
-
-
                 }
                 else
                 {
@@ -189,22 +199,31 @@ public class BallManager : MonoBehaviour
                 }
             }
         }
+
     }
 
     IEnumerator StartExtaBallAnim(List<int> ballIndexList, bool showExtraBall)
     {
         if(showExtraBall){
-            for (int i = 0; i < ballIndexList.Count; i++)
+            //Debug.Log("StartExtrBallAnim");
+            bigBallImg.sprite = extraBallSprite;
+            bigBallImg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.white;
+            for (int i = 0; i < ballIndexList.Count-30; i++)
             {
+
+                bigBallImg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[30 + i].ToString();
+                Debug.Log("i : " + i);
                 if (!extraBalls[i].activeInHierarchy)
                 {
-                    Debug.Log(ballIndexList.Count);
-                    //extraBalls[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[30 + i].ToString(); //NumberGenerator.generatedNO[30+i]
-                    extraBalls[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[ballIndexList.Count-1].ToString(); //NumberGenerator.generatedNO[30+i]
+                    Debug.Log(ballIndexList[30 + i]);
+                    extraBalls[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[30 + i].ToString(); //NumberGenerator.generatedNO[30+i]
+                    //extraBalls[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = ballIndexList[ballIndexList.Count-1].ToString(); //NumberGenerator.generatedNO[30+i]
 
                     extraBalls[i].transform.localPosition = new Vector2(0, 100);
                     extraBalls[i].SetActive(true);
                     extraBalls[i].transform.DOLocalMove(extraBaStartPos[i], ballAnimSpeed);
+                    numberGenerator.totalExtraBallCount--;
+                    numberGenerator.extraBallCountText.text = numberGenerator.totalExtraBallCount.ToString();
                     yield return new WaitForSeconds(ballAnimSpeed + 0.5f);
                     EventManager.ShowBallOnCard(30 + i);
                 }
@@ -215,6 +234,10 @@ public class BallManager : MonoBehaviour
         {
             EventManager.ShowMissingPL(i, true);
         }
+
+        bigBallImg.gameObject.SetActive(false);
+        bigBallImg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = Color.black;
+        EventManager.AutoSpinOver(true);
     }
 
 
@@ -228,7 +251,7 @@ public class BallManager : MonoBehaviour
                 g.GetComponent<Image>().sprite = ballSprite[Random.Range(0, ballSprite.Count)];
                 
 
-                StartCoroutine( ModifyExtraBallPos(g, index));
+                StartCoroutine(ModifyExtraBallPos(g, index));
                 instantiatedExtraBall.Add(g);
             }
             else
@@ -258,7 +281,6 @@ public class BallManager : MonoBehaviour
         // Debug.Log("FA");
         for (int i = 0; i < 4; i++)
         {
-       
             EventManager.ShowMissingPL(i, true);
         }
     }
@@ -271,30 +293,33 @@ public class BallManager : MonoBehaviour
 
        // yield return new WaitForSeconds(numberGenerator.ballAnimSpeed);
 
-        if (index < 10)
-            g.transform.DOLocalMoveY(-164 + 100, numberGenerator.ballAnimSpeed);
-        else
+        if (index < 5)
+            g.transform.DOLocalMoveY(-235 + 100, numberGenerator.ballAnimSpeed);
+        else if (index < 10)
+            g.transform.DOLocalMoveY(-165 + 100, numberGenerator.ballAnimSpeed);
+        else if (index < 15)
             g.transform.DOLocalMoveY(-95 + 100, numberGenerator.ballAnimSpeed);
+        else
+            g.transform.DOLocalMoveY(-25 + 100, numberGenerator.ballAnimSpeed);
 
         yield return new WaitForSeconds(numberGenerator.ballAnimSpeed);
         //Debug.Log(g.transform.localPosition.y);
-        //if ((index + 1) % 10 == 0)
-        //{
-        //    yield return null;
-        //}
-        //else
-        //{
-            g.transform.DOLocalMoveX(extraBallPosArr[index % 10], numberGenerator.ballAnimSpeed);
+        if ((index + 1) % 5 == 0)
+        {
+            yield return null;
+        }
+        else
+        {
+            g.transform.DOLocalMoveX(extraBallPosArr[index % 5], numberGenerator.ballAnimSpeed);
 
-        //}
+        }
         yield return new WaitForSeconds(numberGenerator.ballAnimSpeed);
         EventManager.ShowBallOnCard(ballIndexList.Count - 1);
     }
 
     void ResetBalls()
     {
-        if(extraBallMachine != null)
-            extraBallMachine.SetActive(false);
+        extraBallMachine.SetActive(false);
 
         StopAllCoroutines();
         foreach (var e in balls)
@@ -305,7 +330,6 @@ public class BallManager : MonoBehaviour
         foreach (var e in extraBalls)
         {
             e.SetActive(false);
-            e.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
         }
 
         ballIndex = 0;
@@ -313,8 +337,6 @@ public class BallManager : MonoBehaviour
         {
             g.SetActive(false);
         }
-
-      
     }
 
 
