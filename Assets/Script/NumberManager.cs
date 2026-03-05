@@ -60,7 +60,7 @@ public class NumberManager : MonoBehaviour
         }
         else
         {
-          //  Debug.LogWarning($"Number {num} not found in totalCombinations list.");
+            Debug.LogWarning($"Number {num} not found in totalCombinations list.");
         }
 
         GameManager.instance.numberGenerator.PlaceBallAsPerFetch();

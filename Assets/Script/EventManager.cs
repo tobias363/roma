@@ -27,12 +27,23 @@ public class EventManager : MonoBehaviour
     public static bool isAutoSpinStart = false;
     //public static bool isAutoSpinOver = false;
 
+    private static bool IsProductionAutoPlayBlocked()
+    {
+        return !Application.isEditor && !Debug.isDebugBuild;
+    }
+
     public static void Play()
     {
         OnPlay?.Invoke();
     }
     public static void AutoSpinStart(int count)
     {
+        if (IsProductionAutoPlayBlocked() && count > 1)
+        {
+            Debug.LogWarning("[EventManager] AutoSpin > 1 er deaktivert i production build.");
+            OnAutoSpinOver?.Invoke(true);
+            return;
+        }
         OnAutoSpinStart?.Invoke(count);
     }
     public static void AutoSpinOver(bool gameOver)
