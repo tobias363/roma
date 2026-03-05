@@ -1,9 +1,9 @@
 {
-    "releaseVersion": "20260305-115736",
+    "releaseVersion": "20260305-120929",
     "releaseCommit": "unknown",
-    "builtAtUtc": "2026-03-05T11:59:52.3534690Z",
+    "builtAtUtc": "2026-03-05T12:09:47.2666170Z",
     "unityVersion": "6000.3.10f1",
     "bundleVersion": "0.1",
     "productName": "BingoNew",
-    "buildSizeBytes": 23024181
+    "buildSizeBytes": 56887880
 }
